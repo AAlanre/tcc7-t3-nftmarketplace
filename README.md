@@ -1,36 +1,18 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Simple NFT Marketplace
 
-## Getting Started
+A decentralized marketplace that allows users to mint, list, and purchase NFTs through a fixed-price smart contract, with a full web interface for browsing listings and managing ownership.
 
-First, run the development server:
+## Goal
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Allow users to list and purchase NFTs through a decentralized marketplace.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Core Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Feature | Description |
+|---|---|
+| Connect wallet | Users connect a wallet to mint, list, buy, and manage NFTs |
+| List an NFT for sale | Owners set a fixed price and list their NFT on the marketplace |
+| View marketplace listings | Browse all active listings in a filterable, sortable catalogue |
+| Buy an NFT | Purchase a listed NFT by paying the listed price in ETH |
+| Cancel a listing | Owners can pull an active listing at any time before it sells |
+| View NFT ownership | Users can see everything they own and everything they currently have listed |
