@@ -1,19 +1,53 @@
 import { ethers } from "ethers";
-import ProofStorageABI from "../contracts/out/ProofStorage.sol/ProofStorage.json";
 
-export const getProofContract = async() => {
-    if(typeof window === "undefined") {
-        throw new Error("Must be used in browser");
-    }
-    if(!window.ethereum) {
-        throw new Error("MetaMask is not installed");
-    }
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
+import SimpleNFTABI from "../contracts/out/SimpleNft.sol/SimpleNFT.json";
+import MarketplaceABI from "../contracts/out/NFTMarketplace.sol/NFTMarketplace.json";
 
-    const contractAddress = process.env.NEXT_PUBLIC_PROOF_ADDRESS;
-    if(!contractAddress) {
-        throw new Error("Contract address not set in .env");
-    }
-    return new ethers. Contract (contractAddress, ProofStorageABI.abi, signer);
-};
+async function getProvider() {
+  if (typeof window === "undefined") {
+    throw new Error("Must be used in the browser");
+  }
+
+  if (!window.ethereum) {
+    throw new Error("MetaMask is not installed");
+  }
+
+  return new ethers.BrowserProvider(window.ethereum);
+}
+
+export async function getSigner() {
+  const provider = await getProvider();
+  return provider.getSigner();
+}
+
+export async function getSimpleNftContract() {
+  const signer = await getSigner();
+
+  const address = process.env.NEXT_PUBLIC_SIMPLE_NFT_ADDRESS;
+
+  if (!address) {
+    throw new Error("NEXT_PUBLIC_SIMPLE_NFT_ADDRESS is not set");
+  }
+
+  return new ethers.Contract(
+    address,
+    SimpleNFTABI.abi,
+    signer
+  );
+}
+
+export async function getMarketplaceContract() {
+  const signer = await getSigner();
+
+  const address = process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS;
+
+  if (!address) {
+    throw new Error("NEXT_PUBLIC_MARKETPLACE_ADDRESS is not set");
+  }
+
+  return new ethers.Contract(
+    address,
+    MarketplaceABI.abi,
+    signer
+  );
+}
