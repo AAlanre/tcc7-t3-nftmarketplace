@@ -1,20 +1,128 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #16202b;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-space-grotesk);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Blueprint palette — white paper, cobalt drafting-blue linework */
+  --color-paper: #ffffff;
+  --color-panel: #f3f7ff;
+  --color-panel-deep: #e6eeff;
+  --color-blue-deep: #0f2f7a;
+  --color-blue: #1d4ed8;
+  --color-blue-bright: #2f6feb;
+  --color-graphite: #16202b;
+  --color-muted: #5b6b82;
+  --color-line: #c9daf8;
+  --color-line-strong: #9db8ec;
+  --color-danger: #dc2626;
+}
+
+* {
+  border-color: var(--color-line);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-paper);
+  color: var(--color-graphite);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--color-blue);
+  color: var(--color-paper);
+}
+
+/* Subtle drafting-paper grid, used behind the hero only */
+.blueprint-grid {
+  background-image:
+    linear-gradient(var(--color-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: -1px -1px;
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent 85%);
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
+  opacity: 0.55;
+}
+
+/* Technical-drawing corner registration marks */
+.reg-marks {
+  position: relative;
+}
+.reg-marks::before,
+.reg-marks::after,
+.reg-marks .reg-br,
+.reg-marks .reg-bl {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: var(--color-blue);
+  z-index: 2;
+}
+.reg-marks::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--color-blue);
+  border-left: 2px solid var(--color-blue);
+}
+.reg-marks::after {
+  top: -1px;
+  right: -1px;
+  border-top: 2px solid var(--color-blue);
+  border-right: 2px solid var(--color-blue);
+}
+
+/* Perforated cut-line seam used on lot cards */
+.ticket-seam {
+  position: relative;
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--color-line-strong) 0 6px,
+    transparent 6px 13px
+  );
+}
+
+.ticket-notch {
+  position: absolute;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--color-paper);
+  transform: translateY(-50%);
+}
+
+.ticket-notch-left {
+  left: -9px;
+}
+
+.ticket-notch-right {
+  right: -9px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lot-card-hover {
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .lot-card-hover:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-blue);
+    box-shadow: 0 16px 32px -8px rgba(29, 78, 216, 0.25);
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
 }
