@@ -5,7 +5,7 @@ export function Footer() {
         <div>
           <p className="font-display text-base text-graphite">BLUEPRINT</p>
           <p className="mt-1 font-mono text-[11px] text-muted">
-            An on-chain lot catalogue — built on SimpleNFT &amp; NFTMarketplace.
+            An on-chain lot catalogue  built on SimpleNFT &amp; NFTMarketplace.
           </p>
         </div>
         <div className="flex gap-6 font-mono text-[11px] uppercase tracking-wider text-muted">
