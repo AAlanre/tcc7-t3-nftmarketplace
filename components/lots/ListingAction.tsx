@@ -1,11 +1,13 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { NFTItem } from "@/types/nft";
 import { useWallet } from "@/components/providers/Walletprovider";
 
 type ListingActionsProps = {
   lot: NFTItem;
+
+    onSuccess?: () => Promise<void> | void;
 
   /**
    * These will later call the NFTMarketplace contract.
@@ -32,12 +34,14 @@ const simulate = () =>
 
 export function ListingActions({
   lot,
+  onSuccess,
   onBuy = async () => simulate(),
   onList = async () => simulate(),
   onCancelListing = async () => simulate(),
   onUpdatePrice = async () => simulate(),
 }: ListingActionsProps) {
   const { address, isConnected, connect } = useWallet();
+  const router = useRouter();
 
   const [pending, setPending] = useState(false);
 
@@ -64,9 +68,17 @@ export function ListingActions({
     setMessage(null);
 
     try {
-      await action();
-      setMessage(successMessage);
-    } catch (error) {
+  await action();
+
+  setMessage(successMessage);
+
+  // Give the blockchain a moment to update
+  await new Promise((resolve) =>
+    setTimeout(resolve, 1000)
+  );
+
+  router.refresh();
+} catch (error) {
       console.error(error);
       setMessage("Transaction failed. Please try again.");
     } finally {

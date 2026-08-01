@@ -1,9 +1,16 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import type { NFTItem, ListingStatus } from "@/types/nft";
 import { LotCard } from "@/components/lots/LotCard";
 import { EmptyState } from "@/components/ui/EmptyState";
+import {
+  listNFT,
+  buyNFT,
+  cancelListing,
+  updateListingPrice,
+} from "@/lib/marketplace";
+import { ListingActions } from "@/components/lots/ListingAction";
 
 type FilterValue = "all" | ListingStatus;
 type SortValue = "lot-asc" | "price-asc" | "price-desc";
@@ -24,6 +31,7 @@ const sorts: { value: SortValue; label: string }[] = [
 export function LotGrid({ lots }: { lots: NFTItem[] }) {
   const [filter, setFilter] = useState<FilterValue>("all");
   const [sort, setSort] = useState<SortValue>("lot-asc");
+  const router = useRouter();
 
   const visibleLots = useMemo(() => {
     const filtered =
@@ -87,9 +95,33 @@ return sort === "price-asc"
         />
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {visibleLots.map((lot) => (
-            <LotCard key={lot.id} lot={lot} />
-          ))}
+         {visibleLots.map((lot) => (
+  <div
+    key={lot.id}
+    className="flex flex-col gap-4"
+  >
+    <LotCard lot={lot} />
+
+    <ListingActions
+      lot={lot}
+      onList={(lot, price) =>
+        listNFT(lot.tokenId, price)
+      }
+      onBuy={(lot) =>
+        buyNFT(lot.tokenId, lot.price!)
+      }
+      onCancelListing={(lot) =>
+        cancelListing(lot.tokenId)
+      }
+      onUpdatePrice={(lot, price) =>
+        updateListingPrice(
+          lot.tokenId,
+          price
+        )
+      }
+    />
+  </div>
+))}
         </div>
       )}
     </div>

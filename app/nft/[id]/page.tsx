@@ -1,13 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { formatEther } from "ethers";
+
 
 import { getNFT } from "@/lib/nft";
 import { AddressTag } from "@/components/ui/AddressTag";
 import { StatusChip } from "@/components/ui/StatusChip";
 import { PriceTag } from "@/components/ui/PriceTag";
-import { ListingActions } from "@/components/lots/ListingAction";
+import { NFTDetailActions } from "@/components/nft/NFTDetailActions";
 
 export default async function NFTDetailPage({
   params,
@@ -74,8 +74,8 @@ export default async function NFTDetailPage({
           </div>
 
           <div className="mt-6">
-            <ListingActions lot={lot} />
-          </div>
+  <NFTDetailActions lot={lot} />
+</div>
 
           {/* Provenance */}
           <div className="mt-12 border-t border-line pt-6">
