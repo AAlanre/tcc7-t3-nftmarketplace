@@ -21,6 +21,10 @@ contract NFTMarketplace is ReentrancyGuard, Ownable {
     // nftContract => tokenId => Listing
     mapping(address => mapping(uint256 => Listing)) public listings;
 
+    // Keeps track of every NFT that has ever been listed.
+// We'll use the `active` flag to know which ones are currently for sale.
+Listing[] public allListings;
+
     // Marketplace fee in basis points (e.g. 250 = 2.5%)
     uint256 public feeBps = 250;
     uint256 public constant MAX_FEE_BPS = 1000; // 10% hard cap
@@ -57,6 +61,15 @@ contract NFTMarketplace is ReentrancyGuard, Ownable {
             price: price,
             active: true
         });
+        allListings.push(
+    Listing({
+        seller: msg.sender,
+        nftContract: nftContract,
+        tokenId: tokenId,
+        price: price,
+        active: true
+    })
+);
 
         emit Listed(nftContract, tokenId, msg.sender, price);
     }
@@ -68,7 +81,19 @@ contract NFTMarketplace is ReentrancyGuard, Ownable {
         require(listing.seller == msg.sender, "Marketplace: not seller");
 
         delete listings[nftContract][tokenId];
-        emit ListingCancelled(nftContract, tokenId, msg.sender);
+
+for (uint256 i = 0; i < allListings.length; i++) {
+    if (
+        allListings[i].nftContract == nftContract &&
+        allListings[i].tokenId == tokenId &&
+        allListings[i].active
+    ) {
+        allListings[i].active = false;
+        break;
+    }
+}
+
+emit ListingCancelled(nftContract, tokenId, msg.sender);
     }
 
     /// @notice Update the price of an active listing you created.
@@ -90,6 +115,16 @@ contract NFTMarketplace is ReentrancyGuard, Ownable {
 
         // Effects: clear listing before external calls
         delete listings[nftContract][tokenId];
+        for (uint256 i = 0; i < allListings.length; i++) {
+    if (
+        allListings[i].nftContract == nftContract &&
+        allListings[i].tokenId == tokenId &&
+        allListings[i].active
+    ) {
+        allListings[i].active = false;
+        break;
+    }
+}
 
         // Interactions: move funds, then move the NFT
         uint256 fee = (listing.price * feeBps) / 10_000;
@@ -121,4 +156,30 @@ contract NFTMarketplace is ReentrancyGuard, Ownable {
     function getListing(address nftContract, uint256 tokenId) external view returns (Listing memory) {
         return listings[nftContract][tokenId];
     }
+    /// @notice Returns all active marketplace listings.
+function getActiveListings() external view returns (Listing[] memory) {
+    uint256 activeCount = 0;
+
+    // Count active listings
+    for (uint256 i = 0; i < allListings.length; i++) {
+        if (allListings[i].active) {
+            activeCount++;
+        }
+    }
+
+    // Create an array of the correct size
+    Listing[] memory activeListings = new Listing[](activeCount);
+
+    uint256 currentIndex = 0;
+
+    // Copy active listings
+    for (uint256 i = 0; i < allListings.length; i++) {
+        if (allListings[i].active) {
+            activeListings[currentIndex] = allListings[i];
+            currentIndex++;
+        }
+    }
+
+    return activeListings;
+}
 }
