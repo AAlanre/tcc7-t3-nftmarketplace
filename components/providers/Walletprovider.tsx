@@ -29,18 +29,21 @@ export function WalletProvider({
 }) {
   const [address, setAddress] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
-
-  useEffect(() => {
+  
+useEffect(() => {
   async function checkConnection() {
-    if (!window.ethereum) return;
+    const ethereum = window.ethereum;
+
+    if (!ethereum) return;
 
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-
+      const provider = new ethers.BrowserProvider(ethereum);
       const accounts = await provider.send("eth_accounts", []);
 
       if (accounts.length > 0) {
         setAddress(accounts[0]);
+      } else {
+        setAddress(null);
       }
     } catch (error) {
       console.error(error);
@@ -48,6 +51,37 @@ export function WalletProvider({
   }
 
   checkConnection();
+
+  const ethereum = window.ethereum;
+
+if (!ethereum) return;
+
+ function handleAccountsChanged(accounts: unknown) {
+  const accountList = Array.isArray(accounts)
+    ? (accounts as string[])
+    : [];
+
+  if (accountList.length === 0) {
+    setAddress(null);
+  } else {
+    setAddress(accountList[0]);
+  }
+}
+
+ if ("on" in ethereum) {
+  (ethereum as any).on(
+    "accountsChanged",
+    handleAccountsChanged
+  );
+}
+  return () => {
+  if ("removeListener" in ethereum) {
+    (ethereum as any).removeListener(
+      "accountsChanged",
+      handleAccountsChanged
+    );
+  }
+};
 }, []);
 
   const connect = useCallback(async () => {

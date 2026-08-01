@@ -1,9 +1,10 @@
 import { formatEther } from "ethers";
 import Link from "next/link";
 import { LotGrid } from "@/components/lots/lotGrid";
+import { getAllNFTs } from "@/lib/nft";
 import type { NFTItem } from "@/types/nft";
 
-const lots: NFTItem[] = [];
+
 
 function marketStats(lots: NFTItem[]) {
   const listed = lots.filter((lot) => lot.status === "listed");
@@ -28,7 +29,8 @@ function marketStats(lots: NFTItem[]) {
   };
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const lots = await getAllNFTs();
   const stats = marketStats(lots);
 
   return (

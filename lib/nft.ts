@@ -1,11 +1,14 @@
 import { ethers } from "ethers";
-import { getSimpleNftContract, getMarketplaceContract } from "./contract";
+import {
+  getReadOnlySimpleNftContract,
+  getReadOnlyMarketplaceContract,
+} from "./contract";
 import type { NFTItem } from "@/types/nft";
 
 export async function getNFT(tokenId: string): Promise<NFTItem | null> {
   try {
-    const nftContract = await getSimpleNftContract();
-    const marketplace = await getMarketplaceContract();
+    const nftContract = getReadOnlySimpleNftContract();
+const marketplace = getReadOnlyMarketplaceContract();
 
     // Owner
     const owner = await nftContract.ownerOf(tokenId);
@@ -68,7 +71,7 @@ console.log("Image URI:", metadata.image);
    
 }
  export async function getOwnedNFTs(owner: string): Promise<NFTItem[]> {
-  const nftContract = await getSimpleNftContract();
+const nftContract = getReadOnlySimpleNftContract();
 
   const totalMinted = await nftContract.totalMinted();
 
@@ -95,4 +98,25 @@ for (let i = 0; i < Number(totalMinted); i++) {
 }
 
 return ownedNFTs;
+}
+export async function getAllNFTs(): Promise<NFTItem[]> {
+ const nftContract = getReadOnlySimpleNftContract();
+
+  const totalMinted = await nftContract.totalMinted();
+
+  const nfts: NFTItem[] = [];
+
+  for (let i = 0; i < Number(totalMinted); i++) {
+    try {
+      const nft = await getNFT(i.toString());
+
+      if (nft) {
+        nfts.push(nft);
+      }
+    } catch (error) {
+      console.error(`Failed to load NFT #${i}`, error);
+    }
+  }
+
+  return nfts;
 }

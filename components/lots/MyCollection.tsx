@@ -3,6 +3,16 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { LotCard } from "@/components/lots/LotCard";
+import { ListingActions } from "@/components/lots/ListingAction";
+
+import {
+  listNFT,
+  buyNFT,
+  cancelListing,
+  updateListingPrice,
+} from "@/lib/marketplace";
+
 import { useWallet } from "@/components/providers/Walletprovider";
 import { EmptyState } from "@/components/ui/EmptyState";
 
@@ -14,28 +24,25 @@ export function MyCollection() {
   const [nfts, setNfts] = useState<NFTItem[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-  async function loadNFTs() {
-    if (!address) return;
+ async function loadNFTs() {
+  if (!address) return;
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const ownedNFTs = await getOwnedNFTs(address);
+    const ownedNFTs = await getOwnedNFTs(address);
 
-      console.log("Owned NFTs:", ownedNFTs);
-
-      setNfts(ownedNFTs);
-    } catch (error) {
-      console.error("Failed to load NFTs:", error);
-    } finally {
-      setLoading(false);
-    }
+    setNfts(ownedNFTs);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
   }
+}
 
+useEffect(() => {
   loadNFTs();
 }, [address]);
-
   if (!isConnected || !address) {
     return (
       <EmptyState
@@ -63,31 +70,37 @@ export function MyCollection() {
   );
 }
 
-  if (loading) {
-  return <p>Loading NFTs...</p>;
-}
+  
 
   if (nfts.length > 0) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
       {nfts.map((nft) => (
         <div
           key={nft.id}
-          className="rounded border border-line p-4"
+          className="flex flex-col gap-4"
         >
-          <img
-            src={nft.image}
-            alt={nft.title}
-            className="w-full h-64 object-cover rounded"
+          <LotCard lot={nft} />
+
+          <ListingActions
+            lot={nft}
+            onList={async (lot, price) => {
+  await listNFT(lot.tokenId, price);
+  await loadNFTs();
+}}
+            onBuy={async (lot) => {
+  await buyNFT(lot.tokenId, lot.price!);
+  await loadNFTs();
+}}
+            onCancelListing={async (lot) => {
+  await cancelListing(lot.tokenId);
+  await loadNFTs();
+}}
+            onUpdatePrice={async (lot, price) => {
+  await updateListingPrice(lot.tokenId, price);
+  await loadNFTs();
+}}
           />
-
-          <h3 className="mt-4 font-semibold">
-            {nft.title}
-          </h3>
-
-          <p className="text-sm text-muted">
-            {nft.description}
-          </p>
         </div>
       ))}
     </div>
@@ -108,29 +121,5 @@ return (
     }
   />
 );
-  if (nfts.length > 0) {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {nfts.map((nft) => (
-        <div
-          key={nft.id}
-          className="rounded border border-line p-4"
-        >
-          <img
-            src={nft.image}
-            alt={nft.title}
-            className="w-full h-64 object-cover rounded"
-          />
-
-          <h3 className="mt-4 font-semibold">
-            {nft.title}
-          </h3>
-
-          <p>{nft.description}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 }
