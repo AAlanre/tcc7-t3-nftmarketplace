@@ -11,20 +11,12 @@ type MintFormData = {
 
 type MintFormProps = {
   mintPriceEth: number;
-  /**
-   * Integration Dev: replace this default with a real call to
-   * SimpleNFT.mint(to, tokenURI) via wagmi/ethers. The form only
-   * needs a Promise back — success/error UI is already handled here.
-   */
-  onMint?: (data: MintFormData) => Promise<void>;
+  onMint: (data: MintFormData) => Promise<void>;
 };
-
-const defaultOnMint = async (data: MintFormData): Promise<void> => {
-  console.log("Mock mint submitted — wire this up in /lib:", data);
-  await new Promise<void>((resolve) => setTimeout(resolve, 900));
-};
-
-export function MintForm({ mintPriceEth, onMint = defaultOnMint }: MintFormProps) {
+export function MintForm({
+  mintPriceEth,
+  onMint,
+}: MintFormProps) {
   const { isConnected, connect } = useWallet();
   const [status, setStatus] = useState<"idle" | "minting" | "success" | "error">(
     "idle"

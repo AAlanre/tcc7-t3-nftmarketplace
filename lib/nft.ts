@@ -12,6 +12,7 @@ export async function getNFT(tokenId: string): Promise<NFTItem | null> {
 
     // Token URI
     const tokenURI = await nftContract.tokenURI(tokenId);
+    console.log("Token URI:", tokenURI);
 
     // Marketplace listing
     const listing = await marketplace.getListing(
@@ -20,8 +21,17 @@ export async function getNFT(tokenId: string): Promise<NFTItem | null> {
     );
 
     // Metadata
-    const response = await fetch(tokenURI);
-    const metadata = await response.json();
+    const metadataUrl = tokenURI.startsWith("ipfs://")
+  ? tokenURI.replace(
+      "ipfs://",
+      "https://gateway.pinata.cloud/ipfs/"
+    )
+  : tokenURI;
+
+const response = await fetch(metadataUrl);
+const metadata = await response.json();
+console.log("Metadata:", metadata);
+console.log("Image URI:", metadata.image);
 
     return {
       id: tokenId,
@@ -29,7 +39,13 @@ export async function getNFT(tokenId: string): Promise<NFTItem | null> {
 
       title: metadata.name ?? `NFT #${tokenId}`,
       description: metadata.description ?? "",
-      image: metadata.image ?? "",
+      image:
+  metadata.image?.startsWith("ipfs://")
+    ? metadata.image.replace(
+        "ipfs://",
+        "https://gateway.pinata.cloud/ipfs/"
+      )
+    : metadata.image ?? "",
 
       owner,
       seller: listing.seller,
@@ -49,4 +65,34 @@ export async function getNFT(tokenId: string): Promise<NFTItem | null> {
     console.error(error);
     return null;
   }
+   
+}
+ export async function getOwnedNFTs(owner: string): Promise<NFTItem[]> {
+  const nftContract = await getSimpleNftContract();
+
+  const totalMinted = await nftContract.totalMinted();
+
+console.log("Total Minted:", Number(totalMinted));
+
+const ownedNFTs: NFTItem[] = [];
+
+for (let i = 0; i < Number(totalMinted); i++) {
+  try {
+    const tokenOwner = await nftContract.ownerOf(i);
+
+    if (tokenOwner.toLowerCase() === owner.toLowerCase()) {
+  console.log(`NFT #${i} belongs to ${owner}`);
+
+  const nft = await getNFT(i.toString());
+
+  if (nft) {
+    ownedNFTs.push(nft);
+  }
+}
+  } catch (error) {
+    console.error(`Error checking NFT #${i}`, error);
+  }
+}
+
+return ownedNFTs;
 }
