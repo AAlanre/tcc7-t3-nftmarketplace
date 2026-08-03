@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { formatEther } from "ethers";
 import Link from "next/link";
 import { LotGrid } from "@/components/lots/lotGrid";
